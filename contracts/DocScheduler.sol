@@ -36,7 +36,7 @@ contract DocScheduler is Ownable {
 
   enum Specialization { HAUSARZT, ZAHNARZT, HNO_ARZT, ORTHOPAEDE, KARDIOLOGE, AUGENARZT}
   
-  constructor() {}
+  constructor() public {}
 
   //todo lege Mapping vom Datentyp address auf die Struktur an damit alle erzeugten Arztpraxen gespeichert werden können
   mapping(address => Doctor) doctors;
