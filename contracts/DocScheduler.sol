@@ -34,7 +34,7 @@ contract DocScheduler is Ownable {
     string free_text;
   }
 
-  enum Specialization { HAUSARZT, ZAHNARZT, HNO-ARZT, ORTHOPAEDE, KARDEOLOGE, AUGENARZT}
+  enum Specialization { HAUSARZT, ZAHNARZT, HNO_ARZT, ORTHOPAEDE, KARDIOLOGE, AUGENARZT}
   
   constructor() {}
 
