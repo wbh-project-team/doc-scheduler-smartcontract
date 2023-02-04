@@ -52,16 +52,16 @@ contract DocScheduler is Ownable {
   //todo erstelle createDoctorsOffice Methode
   //diese soll aus der Website aufgerufen werden und die Struktur übergeben bekommen
   //die Struktur soll in das Mapping unter der addresse des Arztes geschrieben werden
-  function createDoctorsOffice(Doctor new_doctor) public  {
-    doctors[new_doctor.wallet_address] = new_doctor;
+  function createDoctorsOffice(Doctor memory _new_doctor) public  {
+    doctors[_new_doctor.wallet_address] = _new_doctor;
   }
 
   //todo erstelle reconfigureOffice Methode
   //diese soll aus der Website aufgerufen werden und die Struktur übergeben bekommen
   //eintrag im Mapping soll mit der übergebenen Struktur überschrieben werden
-  function reconfigureOffice(Doctor old_doctor) public {
-    require(msg.sender == old_doctor.address, "Sorry, you have no permission to make changes");
-    doctors[reconfigured_doctor.wallet_address] = reconfigured_doctor;
+  function reconfigureOffice(Doctor memory _old_doctor) public {
+    require(msg.sender == _old_doctor.address, "Sorry, you have no permission to make changes");
+    doctors[_old_doctor.wallet_address] = _old_doctor;
   }
 
   //todo erstelle createAppointment
@@ -69,7 +69,7 @@ contract DocScheduler is Ownable {
   // methode sollte payable sein, da Geld an Appointment durchgereicht werden muss
   // es soll ein neues Appointment(contract) erzeugt werden
    
-  event Appointment(address _patient, address _doctor, uint from_time, uint to_time, uint _value);
+  event Appointment(address patient, address doctor, uint from_time, uint to_time, uint value);
 
   //check if ethers deposited
   modifier ifEthersDeposited(uint _amount){
@@ -77,8 +77,8 @@ contract DocScheduler is Ownable {
     _;
   }
 
-  function _createAppointment(address _doctorsAddress, DateTime _fromDateTime, DateTime _toDateTime) payable private ifEthersDeposited(15 ether)  { 
-    current_doc = doctors[_doctorsAddress];
+  function _createAppointment(address _doctorsAddress, DateTime memory _fromDateTime, DateTime memory _toDateTime) payable private ifEthersDeposited(15 ether)  { 
+    Doctor storage current_doc = doctors[_doctorsAddress];
     require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _toDateTime), "Sorry, timeslot is not awailable");
     
     // how to check if timeslot is already blocked with other appointment?!
@@ -86,26 +86,27 @@ contract DocScheduler is Ownable {
     emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _toDateTime, msg.value);
   }
 
-  function checkDoctorsTimeslot(OfficeDay [] officeSchedule, DateTime fromDateTime, DateTime toDateTime) private returns (bool){
+  function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, DateTime memory _toDateTime) private returns (bool){
     // pruefe ob geoeffnet
     
-    weekday = weekDay(fromDateTime.day, fromDateTime.month, fromDateTime.year);
+    uint weekday = weekDay(_fromDateTime.day, _fromDateTime.month, _fromDateTime.year);
 
     // pruefe ob Timeslot noch verfuegbar
 
     // to be continued
-    return (fromDateTime.hour > officeSchedule[weekday].opening_time &&  fromDateTime.hour < officeSchedule[weekday].closing_time);  // to be continued argh
+    return (_fromDateTime.hour > _officeSchedule[weekday].opening_time &&  _fromDateTime.hour < _officeSchedule[weekday].closing_time);  // to be continued argh
   }
 
-  function leapYear(uint year) private returns (bool):
-    if (!((year%4) && (year%100)) || !(year%400))  return true;
+  function leapYear(uint _year) private returns (bool){
+    if (!((_year%4) && (_year%100)) || !(_year%400))  return true;
     return false;
   }
 
-  function weekDay(uint day, uint month, uint year) private returns (uint) {
-    uint nums[12] = [1,4,4,0,2,5,0,3,6,1,4,6];
-    uint num = (year % 100) / 4 + day + nums[month-1];
-    if (leapYear(year) && month <= 2) num -= 1;
+  function weekDay(uint _day, uint _month, uint _year) private returns (uint) {
+    uint[12] nums = [1,4,4,0,2,5,0,3,6,1,4,6];
+    uint num = (_year % 100) / 4 + _day + nums[_month-1];
+    if (leapYear(_year) && _month <= 2) num -= 1;
     return (num-1)%7 + 2; // gilt nur zwischen 2000 und 2099
   }
+}
   
