@@ -71,37 +71,36 @@ contract DocScheduler is Ownable {
     _;
   }
 
-  function _createAppointment(address _doctorsAddress, uint _fromTime, uint _toTime) payable private ifEthersDeposited(15 ether)  { 
+  function _createAppointment(address _doctorsAddress, uint _fromDateTime, uint _toDateTime) payable private ifEthersDeposited(15 ether)  { 
     current_doc = doctors[_doctorsAddress];
-    require(checkDoctorsTimeslot(current_doc.office_schedule, _fromTime, _toTime), "Sorry, timeslot is not awailable");
+    require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _toDateTime), "Sorry, timeslot is not awailable");
     
     // how to check if timeslot is already blocked with other appointment?!
 
-    emit Appointment(msg.sender, _doctorsAddress, _fromTime, _toTime, msg.value);
+    emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _toDateTime, msg.value);
   }
 
-  function checkDoctorsTimeslot(OfficeDay [] officeSchedule, uint from, uint to) private returns (bool){
+  function checkDoctorsTimeslot(OfficeDay [] officeSchedule, uint fromDateTime, uint toDateTime) private returns (bool){
     // pruefe ob geoeffnet
-    //day = ?  from / years ...argh
+    year =  fromDateTime / years;
+    month = (fromDateTime - year*years) / 12;
+    day = (fromDateTime - year*years - month * months)  
     //weekday = weekDay(day, month, year);
+
     // pruefe ob Timeslot noch verfuegbar
 
-    //return (from > )
+    //return (fromDateTime > )
   }
 
   function leapYear(uint year) private returns (bool):
-    if (!((year%4) && (year%100)) || !(year%400)){
-      return true;
-    }
+    if (!((year%4) && (year%100)) || !(year%400))  return true;
     return false;
   }
 
   function weekDay(uint day, uint month, uint year) private returns (uint) {
     uint nums[12] = [1,4,4,0,2,5,0,3,6,1,4,6];
     uint num = (year % 100) / 4 + day + nums[month-1];
-    if (leapYear(year) && month <= 2){
-      num -= 1;
-    }
+    if (leapYear(year) && month <= 2) num -= 1;
     return (num-1)%7 + 2; // gilt nur zwischen 2000 und 2099
   }
   
