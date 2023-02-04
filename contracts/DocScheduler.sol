@@ -34,9 +34,15 @@ contract DocScheduler is Ownable {
     string free_text;
   }
 
-  enum Specialization { HAUSARZT, ZAHNARZT, HNO_ARZT, ORTHOPAEDE, KARDIOLOGE, AUGENARZT}
+  struct DateTime {
+    uint day;
+    uint month;
+    uint year;
+    uint hour;
+    uint minute;
+  }
 
-  address payable public owner;
+  enum Specialization { HAUSARZT, ZAHNARZT, HNO_ARZT, ORTHOPAEDE, KARDIOLOGE, AUGENARZT}
   
   constructor() public {}
 
@@ -71,7 +77,7 @@ contract DocScheduler is Ownable {
     _;
   }
 
-  function _createAppointment(address _doctorsAddress, uint _fromDateTime, uint _toDateTime) payable private ifEthersDeposited(15 ether)  { 
+  function _createAppointment(address _doctorsAddress, DateTime _fromDateTime, DateTime _toDateTime) payable private ifEthersDeposited(15 ether)  { 
     current_doc = doctors[_doctorsAddress];
     require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _toDateTime), "Sorry, timeslot is not awailable");
     
@@ -80,16 +86,15 @@ contract DocScheduler is Ownable {
     emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _toDateTime, msg.value);
   }
 
-  function checkDoctorsTimeslot(OfficeDay [] officeSchedule, uint fromDateTime, uint toDateTime) private returns (bool){
+  function checkDoctorsTimeslot(OfficeDay [] officeSchedule, DateTime fromDateTime, DateTime toDateTime) private returns (bool){
     // pruefe ob geoeffnet
-    year =  fromDateTime / years;
-    month = (fromDateTime - year*years) / 12;
-    day = (fromDateTime - year*years - month * months)  
-    //weekday = weekDay(day, month, year);
+    
+    weekday = weekDay(fromDateTime.day, fromDateTime.month, fromDateTime.year);
 
     // pruefe ob Timeslot noch verfuegbar
 
-    //return (fromDateTime > )
+    // to be continued
+    return (fromDateTime.hour > officeSchedule[weekday].opening_time &&  fromDateTime.hour < officeSchedule[weekday].closing_time);  // to be continued argh
   }
 
   function leapYear(uint year) private returns (bool):
