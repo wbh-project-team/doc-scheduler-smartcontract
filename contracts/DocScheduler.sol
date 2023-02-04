@@ -92,17 +92,24 @@ contract DocScheduler is Ownable {
     uint weekday = weekDay(_fromDateTime.day, _fromDateTime.month, _fromDateTime.year);
 
     // pruefe ob Timeslot noch verfuegbar
+    uint fromTime = _fromDateTime.hour*1 hours +  _fromDateTime.minute* 1 minutes;
+    uint toTime = _toDateTime.hour* 1 hours + _toDateTime.minute* 1 minutes;
 
     // to be continued
-    return (_fromDateTime.hour > _officeSchedule[weekday].opening_time &&  _fromDateTime.hour < _officeSchedule[weekday].closing_time);  // to be continued argh
+    return ((fromTime > _officeSchedule[weekday].opening_time 
+            && toTime < _officeSchedule[weekday].start_lunchbreak)
+            || (fromTime > _officeSchedule[weekday].stop_lunchbreak 
+            && toTime < _officeSchedule[weekday].closing_time) ); 
   }
 
-  function leapYear(uint _year) private returns (bool){
+  function leapYear(uint _year) private pure returns (bool){
     if (!((_year%4) && (_year%100)) || !(_year%400))  return true;
     return false;
   }
 
-  function weekDay(uint _day, uint _month, uint _year) private returns (uint) {
+  // gets real date as number of each _day, _month, _year  e.g. = 1, 7, 23 for 07.01.2023
+  // returns 0 for monday, 1 for tuesday, etc.
+  function weekDay(uint _day, uint _month, uint _year) private pure returns (uint) {
     uint[12] nums = [1,4,4,0,2,5,0,3,6,1,4,6];
     uint num = (_year % 100) / 4 + _day + nums[_month-1];
     if (leapYear(_year) && _month <= 2) num -= 1;
