@@ -16,6 +16,7 @@ contract DocScheduler is Ownable {
       OfficeDay[] office_schedule;
       Description description; // evtl direkt in html Format oder besser verschiedene description variablen
       Specialization [] specialization;
+      mapping(string => uint) consultationDuration;
   }
 
   struct OfficeDay {
@@ -53,6 +54,7 @@ contract DocScheduler is Ownable {
   //diese soll aus der Website aufgerufen werden und die Struktur übergeben bekommen
   //die Struktur soll in das Mapping unter der addresse des Arztes geschrieben werden
   function createDoctorsOffice(Doctor memory _new_doctor) public  {
+    // ist die Struktur _new_doctor schon mit Daten gefuellt?
     doctors[_new_doctor.wallet_address] = _new_doctor;
   }
 
@@ -69,7 +71,7 @@ contract DocScheduler is Ownable {
   // methode sollte payable sein, da Geld an Appointment durchgereicht werden muss
   // es soll ein neues Appointment(contract) erzeugt werden
    
-  event Appointment(address patient, address doctor, uint from_time, uint to_time, uint value);
+  event Appointment(address patient, address doctor, uint from_time, uint duration, uint value);
 
   //check if ethers deposited
   modifier ifEthersDeposited(uint _amount){
@@ -77,25 +79,24 @@ contract DocScheduler is Ownable {
     _;
   }
 
-  function _createAppointment(address _doctorsAddress, DateTime memory _fromDateTime, DateTime memory _toDateTime) payable private ifEthersDeposited(15 ether)  { 
+  function _createAppointment(address _doctorsAddress, DateTime memory _fromDateTime, uint _duration) payable private ifEthersDeposited(15 ether)  { 
     Doctor storage current_doc = doctors[_doctorsAddress];
-    require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _toDateTime), "Sorry, timeslot is not awailable");
+    require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _duration), "Sorry, timeslot is not awailable");
     
     // how to check if timeslot is already blocked with other appointment?!
 
-    emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _toDateTime, msg.value);
+    emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _duration, msg.value);
   }
 
-  function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, DateTime memory _toDateTime) private returns (bool){
-    // pruefe ob geoeffnet
+  function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, uint _duration) private returns (bool){
     
+    // Ueberpruefung, ob Timeslot noch verfuegbar, noch nicht implementiert
+    uint fromTime = _fromDateTime.hour*1 hours +  _fromDateTime.minute* 1 minutes;
+    uint toTime = fromTime + _duration;
+
+    // pruefe ob geoeffnet
     uint weekday = weekDay(_fromDateTime.day, _fromDateTime.month, _fromDateTime.year);
 
-    // pruefe ob Timeslot noch verfuegbar
-    uint fromTime = _fromDateTime.hour*1 hours +  _fromDateTime.minute* 1 minutes;
-    uint toTime = _toDateTime.hour* 1 hours + _toDateTime.minute* 1 minutes;
-
-    // to be continued
     return ((fromTime > _officeSchedule[weekday].opening_time 
             && toTime < _officeSchedule[weekday].start_lunchbreak)
             || (fromTime > _officeSchedule[weekday].stop_lunchbreak 
