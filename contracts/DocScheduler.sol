@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import './Ownable.sol';
-import './Evaluations/Evaluation.sol';
 
 //https://remix.ethereum.org
 
@@ -62,7 +61,7 @@ contract DocScheduler is Ownable {
   //diese soll aus der Website aufgerufen werden und die Struktur übergeben bekommen
   //eintrag im Mapping soll mit der übergebenen Struktur überschrieben werden
   function reconfigureOffice(Doctor memory _old_doctor) public {
-    require(msg.sender == _old_doctor.address, "Sorry, you have no permission to make changes");
+    require(msg.sender == _old_doctor.wallet_address, "Sorry, you have no permission to make changes");
     doctors[_old_doctor.wallet_address] = _old_doctor;
   }
 
@@ -71,7 +70,7 @@ contract DocScheduler is Ownable {
   // methode sollte payable sein, da Geld an Appointment durchgereicht werden muss
   // es soll ein neues Appointment(contract) erzeugt werden
    
-  event Appointment(address patient, address doctor, uint from_time, uint duration, uint value);
+  event Appointment(address patient, address doctor, DateTime from_time, uint duration, uint value);
 
   //check if ethers deposited
   modifier ifEthersDeposited(uint _amount){
@@ -79,13 +78,13 @@ contract DocScheduler is Ownable {
     _;
   }
 
-  function _createAppointment(address _doctorsAddress, DateTime memory _fromDateTime, uint _duration) payable private ifEthersDeposited(15 ether)  { 
+  function _createAppointment(address _doctorsAddress, DateTime memory _fromDateTime, uint _duration) payable public ifEthersDeposited(15 ether)  { 
     Doctor storage current_doc = doctors[_doctorsAddress];
     require(checkDoctorsTimeslot(current_doc.office_schedule, _fromDateTime, _duration), "Sorry, timeslot is not awailable");
     
     // how to check if timeslot is already blocked with other appointment?!
 
-    emit Appointment(msg.sender, _doctorsAddress, _fromTDateime, _duration, msg.value);
+    emit Appointment(msg.sender, _doctorsAddress, _fromDateTime, _duration, msg.value);
   }
 
   function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, uint _duration) private returns (bool){
@@ -104,17 +103,17 @@ contract DocScheduler is Ownable {
   }
 
   function leapYear(uint _year) private pure returns (bool){
-    if (!((_year%4) && (_year%100)) || !(_year%400))  return true;
+    if (!(((_year%4!=0) && (_year%100!=0)) || (_year%400==0))) return true;
     return false;
   }
 
-  // gets real date as number of each _day, _month, _year  e.g. = 1, 7, 23 for 07.01.2023
+  // gets real date as number of each _day, _month, _year  e.g. = 1, 7, 23 for 07.01.2023 (Saturday)
   // returns 0 for monday, 1 for tuesday, etc.
   function weekDay(uint _day, uint _month, uint _year) private pure returns (uint) {
-    uint[12] nums = [1,4,4,0,2,5,0,3,6,1,4,6];
-    uint num = (_year % 100) / 4 + _day + nums[_month-1];
+    uint8[12] memory nums = [1,4,4,0,2,5,0,3,6,1,4,6];
+    uint num = (_year % 100) + (_year %100) / 4 + _day + nums[_month-1];
     if (leapYear(_year) && _month <= 2) num -= 1;
-    return (num-1)%7 + 2; // gilt nur zwischen 2000 und 2099
+    return (num-1-2)%7; // gilt nur zwischen 2000 und 2099
   }
 }
   
