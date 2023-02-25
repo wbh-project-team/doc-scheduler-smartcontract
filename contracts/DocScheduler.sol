@@ -9,20 +9,20 @@ contract DocScheduler is Ownable {
 
   //todo lege eine Struktur an die alle wichtigen Daten einer Arztpraxis enthält z.B. Name, öffnungszeiten, WalletAdresse des Arzt
   struct Doctor {
-      string first_name;
-      string last_name;
-      address wallet_address; // https://dev.singularitynet.io/docs/concepts/ethereum-address/
-      OfficeDay[] office_schedule;
-      Description description; // evtl direkt in html Format oder besser verschiedene description variablen
-      Specialization [] specialization;
-      mapping(string => uint) consultationDuration;
+    string first_name;
+    string last_name;
+    address wallet_address; // https://dev.singularitynet.io/docs/concepts/ethereum-address/
+    OfficeDay[] office_schedule;
+    Description description; // evtl direkt in html Format oder besser verschiedene description variablen
+    Specialization [] specialization;
+    mapping(string => uint) consultationDuration;
   }
 
   struct OfficeDay {
-    uint opening_time;
-    uint closing_time;
-    uint start_lunchbreak;
-    uint stop_lunchbreak;
+    uint opening_time;  // 8:00 = 8* hours = 28800
+    uint closing_time;  // 18:00 = 18*hours = 64800
+    uint start_lunchbreak; // 12:00 = 12*hours = 43200
+    uint stop_lunchbreak; // 13:00 = 13*houra = 46800
   }
 
   struct Description {
@@ -87,16 +87,20 @@ contract DocScheduler is Ownable {
     emit Appointment(msg.sender, _doctorsAddress, _fromDateTime, _duration, msg.value);
   }
 
-  function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, uint _duration) private returns (bool){
+  // input zb: // [[28800, 64800, 43200, 46800], [28800, 64800, 43200, 46800], [28800, 64800, 43200, 46800], [28800, 64800, 43200, 46800], [28800, 64800, 43200, 46800], [28800, 28800, 28800, 28800], [28800, 28800, 28800, 28800]], [27,2,2023,10,10], 3600
+  function checkDoctorsTimeslot(OfficeDay[] memory _officeSchedule, DateTime memory _fromDateTime, uint256 _duration_in_sec) public  view returns (bool){
     
-    // Ueberpruefung, ob Timeslot noch verfuegbar, noch nicht implementiert
-    uint fromTime = _fromDateTime.hour*1 hours +  _fromDateTime.minute* 1 minutes;
-    uint toTime = fromTime + _duration;
+    // ToDo: Ueberpruefung, ob Timeslot noch verfuegbar, noch nicht implementiert!!
+    //       wie vorhandene Termine einlesen?
+
+    uint256 fromTime = _fromDateTime.hour*1 hours +  _fromDateTime.minute* 1 minutes;
+    uint256 toTime = fromTime + _duration_in_sec;
+    //console.log( "Output: %s %s hour: %s", fromTime, toTime, 1 hours);
 
     // pruefe ob geoeffnet
-    uint weekday = weekDay(_fromDateTime.day, _fromDateTime.month, _fromDateTime.year);
-
-    return ((fromTime > _officeSchedule[weekday].opening_time 
+    uint256 weekday = weekDay(_fromDateTime.day, _fromDateTime.month, _fromDateTime.year);
+    //console.log( "openingtime: %s", _officeSchedule[weekday].opening_time);
+    return ((fromTime > _officeSchedule[weekday].opening_time
             && toTime < _officeSchedule[weekday].start_lunchbreak)
             || (fromTime > _officeSchedule[weekday].stop_lunchbreak 
             && toTime < _officeSchedule[weekday].closing_time) ); 
