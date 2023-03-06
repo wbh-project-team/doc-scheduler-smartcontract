@@ -24,6 +24,7 @@ const fs = require('fs');
 const mnemonic = fs.readFileSync('.secret').toString().trim();
 const infuraKey = fs.readFileSync('.infura').toString().trim();
 const etherscan = fs.readFileSync('.etherscan').toString().trim();
+const auroratest = fs.readFileSync('.auroratest').toString().trim();
 const polygonscan = fs.readFileSync('.polygonscan').toString().trim();
 
 module.exports = {
@@ -74,7 +75,31 @@ module.exports = {
           `wss://sepolia.infura.io/ws/v3/${infuraKey}`
         ),
 
+      gas: 10000000,
       network_id: '11155111'
+    },
+    auroraTestnet: {
+      provider: () =>
+        new HDWalletProvider(mnemonic, 'https://testnet.aurora.dev'),
+      network_id: 0x4e454153,
+      gas: 10000000,
+      from: '0xEF571ac215b9eC5Ef22a12954fF0d87d90e1F10B' // CHANGE THIS ADDRESS
+    },
+    aurora: {
+      provider: () =>
+        new HDWalletProvider(mnemonic, 'wss://mainnet.aurora.dev'),
+      network_id: 0x4e454152,
+      gas: 10000000,
+      from: '0xEF571ac215b9eC5Ef22a12954fF0d87d90e1F10B' // CHANGE THIS ADDRESS
+    },
+    xDai: {
+      provider: () =>
+        new HDWalletProvider(mnemonic, 'wss://rpc.xdaichain.com/wss'),
+      network_id: 100,
+      confirmations: 2,
+      gas: 50000000,
+      gasPrice: 10000000000,
+      skipDryRun: true
     },
     matic: {
       provider: () =>
