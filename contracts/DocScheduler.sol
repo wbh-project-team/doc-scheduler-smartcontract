@@ -21,8 +21,11 @@ contract DocScheduler is Ownable {
     string city;
     string phoneNumber;
     string freeText;
-    OfficeDay[7] officeSchedule;
-    Specialization[6] specialization;
+    uint256[] openingTime;
+    uint256[] closingTime;
+    uint256[] startLunchbreak;
+    uint256[] stopLunchbreak;
+    uint256[] specializations;
   }
 
   struct OfficeDay {
@@ -30,15 +33,6 @@ contract DocScheduler is Ownable {
     uint256 closingTime;
     uint256 startLunchbreak;
     uint256 stopLunchbreak;
-  }
-
-  enum Specialization {
-    FamilyDoctor,
-    Dentist,
-    EntDoctor,
-    Orthopaedics,
-    Cardiologist,
-    Ophthalmologist
   }
 
   Doctor[] internal _doctors;
@@ -66,8 +60,11 @@ contract DocScheduler is Ownable {
         newDoctor.city,
         newDoctor.phoneNumber,
         newDoctor.freeText,
-        newDoctor.officeSchedule,
-        newDoctor.specialization
+        newDoctor.openingTime,
+        newDoctor.closingTime,
+        newDoctor.startLunchbreak,
+        newDoctor.stopLunchbreak,
+        newDoctor.specializations
       )
     );
   }
@@ -86,8 +83,11 @@ contract DocScheduler is Ownable {
     _doctors[doctor.id].city = doctor.city;
     _doctors[doctor.id].phoneNumber = doctor.phoneNumber;
     _doctors[doctor.id].freeText = doctor.freeText;
-    _doctors[doctor.id].officeSchedule = doctor.officeSchedule;
-    _doctors[doctor.id].specialization = doctor.specialization;
+    _doctors[doctor.id].openingTime = doctor.openingTime;
+    _doctors[doctor.id].closingTime = doctor.closingTime;
+    _doctors[doctor.id].startLunchbreak = doctor.startLunchbreak;
+    _doctors[doctor.id].stopLunchbreak = doctor.stopLunchbreak;
+    _doctors[doctor.id].specializations = doctor.specializations;
   }
 
   function getDoctors() external view returns (Doctor[] memory) {
