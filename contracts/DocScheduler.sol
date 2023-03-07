@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import './Ownable.sol';
-import './DateTime/DateTimeContract.sol';
+import './DateTimeContract.sol';
 
 contract DocScheduler is Ownable {
   uint256 internal _counter;
