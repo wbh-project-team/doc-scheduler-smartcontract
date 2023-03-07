@@ -16,7 +16,6 @@ contract DocScheduler is Ownable {
     string firstName;
     string lastName;
     string street;
-    uint256 streetNumber;
     uint256 zipCode;
     string city;
     string phoneNumber;
@@ -55,7 +54,6 @@ contract DocScheduler is Ownable {
         newDoctor.firstName,
         newDoctor.lastName,
         newDoctor.street,
-        newDoctor.streetNumber,
         newDoctor.zipCode,
         newDoctor.city,
         newDoctor.phoneNumber,
@@ -78,7 +76,6 @@ contract DocScheduler is Ownable {
     _doctors[doctor.id].firstName = doctor.firstName;
     _doctors[doctor.id].lastName = doctor.lastName;
     _doctors[doctor.id].street = doctor.street;
-    _doctors[doctor.id].streetNumber = doctor.streetNumber;
     _doctors[doctor.id].zipCode = doctor.zipCode;
     _doctors[doctor.id].city = doctor.city;
     _doctors[doctor.id].phoneNumber = doctor.phoneNumber;
