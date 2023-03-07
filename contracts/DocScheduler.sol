@@ -14,24 +14,17 @@ contract DocScheduler is Ownable {
     address owner;
     //todo move this data to ipfs
     string firstName;
-    string lastName;
+    string name;
     string street;
     uint256 zipCode;
     string city;
     string phoneNumber;
-    string freeText;
+    string description;
     uint256[] openingTime;
     uint256[] closingTime;
-    uint256[] startLunchbreak;
-    uint256[] stopLunchbreak;
-    uint256[] specializations;
-  }
-
-  struct OfficeDay {
-    uint256 openingTime;
-    uint256 closingTime;
-    uint256 startLunchbreak;
-    uint256 stopLunchbreak;
+    uint256[] lunchStart;
+    uint256[] lunchEnd;
+    string[] specializations;
   }
 
   Doctor[] internal _doctors;
