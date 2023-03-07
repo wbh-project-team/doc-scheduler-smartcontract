@@ -45,16 +45,16 @@ contract DocScheduler is Ownable {
         _counter++,
         msg.sender,
         newDoctor.firstName,
-        newDoctor.lastName,
+        newDoctor.name,
         newDoctor.street,
         newDoctor.zipCode,
         newDoctor.city,
         newDoctor.phoneNumber,
-        newDoctor.freeText,
+        newDoctor.description,
         newDoctor.openingTime,
         newDoctor.closingTime,
-        newDoctor.startLunchbreak,
-        newDoctor.stopLunchbreak,
+        newDoctor.lunchStart,
+        newDoctor.lunchEnd,
         newDoctor.specializations
       )
     );
@@ -67,16 +67,16 @@ contract DocScheduler is Ownable {
     );
 
     _doctors[doctor.id].firstName = doctor.firstName;
-    _doctors[doctor.id].lastName = doctor.lastName;
+    _doctors[doctor.id].name = doctor.name;
     _doctors[doctor.id].street = doctor.street;
     _doctors[doctor.id].zipCode = doctor.zipCode;
     _doctors[doctor.id].city = doctor.city;
     _doctors[doctor.id].phoneNumber = doctor.phoneNumber;
-    _doctors[doctor.id].freeText = doctor.freeText;
+    _doctors[doctor.id].description = doctor.description;
     _doctors[doctor.id].openingTime = doctor.openingTime;
     _doctors[doctor.id].closingTime = doctor.closingTime;
-    _doctors[doctor.id].startLunchbreak = doctor.startLunchbreak;
-    _doctors[doctor.id].stopLunchbreak = doctor.stopLunchbreak;
+    _doctors[doctor.id].lunchStart = doctor.lunchStart;
+    _doctors[doctor.id].lunchEnd = doctor.lunchEnd;
     _doctors[doctor.id].specializations = doctor.specializations;
   }
 
