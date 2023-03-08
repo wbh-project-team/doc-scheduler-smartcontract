@@ -25,6 +25,8 @@ contract DocScheduler is Ownable {
     uint256[] lunchStart;
     uint256[] lunchEnd;
     string[] specializations;
+    string[] categoryNames;
+    uint256[] categoryDurations;
   }
 
   Doctor[] internal _doctors;
@@ -55,7 +57,9 @@ contract DocScheduler is Ownable {
         newDoctor.closingTime,
         newDoctor.lunchStart,
         newDoctor.lunchEnd,
-        newDoctor.specializations
+        newDoctor.specializations,
+        newDoctor.categoryNames,
+        newDoctor.categoryDurations
       )
     );
   }
@@ -78,6 +82,8 @@ contract DocScheduler is Ownable {
     _doctors[doctor.id].lunchStart = doctor.lunchStart;
     _doctors[doctor.id].lunchEnd = doctor.lunchEnd;
     _doctors[doctor.id].specializations = doctor.specializations;
+    _doctors[doctor.id].categoryNames = doctor.categoryNames;
+    _doctors[doctor.id].categoryDurations = doctor.categoryDurations;
   }
 
   function getDoctors() external view returns (Doctor[] memory) {
@@ -87,21 +93,37 @@ contract DocScheduler is Ownable {
   struct Appointment {
     uint256 id;
     uint256 startTime;
+    string categoryName;
     uint256 duration;
     address patient;
     uint256 doctorsId;
     uint256 reservationFee;
   }
 
-  //make seperate contract
-  function createAppointment(Appointment calldata appointment)
-    external
-    payable
-  {
+  //todo make seperate contract
+  function createAppointment(
+    Appointment calldata appointment
+  ) external payable {
     require(
       msg.value == _reservationFee,
       'msg.value not equal to reservation Fee'
     );
+    //todo check category name
+    uint256 place = 0;
+    for (
+      uint256 i = 0;
+      i < _doctors[appointment.doctorsId].categoryNames.length;
+      i++
+    ) {
+      if (
+        keccak256(
+          abi.encodePacked(_doctors[appointment.doctorsId].categoryNames[i])
+        ) == keccak256(abi.encodePacked(appointment.categoryName))
+      ) {
+        place = i;
+        break;
+      }
+    }
 
     _reservationFeeStorage[appointment.doctorsId][
       _appointmentCounter[appointment.doctorsId]
@@ -110,7 +132,8 @@ contract DocScheduler is Ownable {
       Appointment(
         _appointmentCounter[appointment.doctorsId]++,
         appointment.startTime,
-        appointment.duration,
+        appointment.categoryName,
+        _doctors[appointment.doctorsId].categoryDurations[place],
         appointment.patient,
         appointment.doctorsId,
         _reservationFee
@@ -118,11 +141,9 @@ contract DocScheduler is Ownable {
     );
   }
 
-  function getAppointments(uint256 doctorId)
-    external
-    view
-    returns (Appointment[] memory)
-  {
+  function getAppointments(
+    uint256 doctorId
+  ) external view returns (Appointment[] memory) {
     return _appointments[doctorId];
   }
 
@@ -134,9 +155,10 @@ contract DocScheduler is Ownable {
     _reservationFee = newFee;
   }
 
-  function payoutAppointment(uint256 doctorId, uint256 appointmentId)
-    external
-  {}
+  function payoutAppointment(
+    uint256 doctorId,
+    uint256 appointmentId
+  ) external {}
 
   function getDay(uint256 startTime) public view returns (uint256) {
     return _dateTime.getDayOfWeek(startTime);
