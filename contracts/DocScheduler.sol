@@ -163,4 +163,16 @@ contract DocScheduler is Ownable {
   function getDay(uint256 startTime) public view returns (uint256) {
     return _dateTime.getDayOfWeek(startTime);
   }
+
+  mapping(address => string) internal _patientNameCids;
+
+  function getPatientNameCid(
+    address walletAddress
+  ) external view returns (string memory) {
+    return _patientNameCids[walletAddress];
+  }
+
+  function storeCid(string calldata cid) external {
+    _patientNameCids[msg.sender] = cid;
+  }
 }
